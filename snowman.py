@@ -1,23 +1,94 @@
 import random
 
-# List of secret words
 WORDS = ["python", "git", "github", "snowman", "meltdown"]
+
+STAGES = [
+    """
+     ___
+    /___\\
+    (o o)
+    ( : )
+    ( : )
+    """,
+    """
+     ___
+    /___\\
+    (o o)
+    ( : )
+    """,
+    """
+     ___
+    /___\\
+    (o o)
+    """,
+    """
+     ___
+    /___\\
+    """,
+    """
+
+    * * *
+    *paff*
+    * * *
+    """
+]
 
 
 def get_random_word():
-    """Selects a random word from the list."""
-    return WORDS[random.randint(0, len(WORDS) - 1)]
+    return random.choice(WORDS)
+
+
+def display_game_state(mistakes, secret_word, guessed_letters):
+    print(STAGES[mistakes])
+
+    display_word = ""
+    for letter in secret_word:
+        if letter in guessed_letters:
+            display_word += letter + " "
+        else:
+            display_word += "_ "
+    print(display_word)
+
+    print(f"Bisher geraten: {', '.join(sorted(guessed_letters))}\n")
 
 
 def play_game():
     secret_word = get_random_word()
-    print("Welcome to Snowman Meltdown!")
-    print("Secret word selected: " + secret_word)  # for testing, later remove this line
+    guessed_letters = []
+    mistakes = 0
+    max_failures = len(STAGES) - 1
 
-    # TODO: Build your game loop here.
-    # For now, simply prompt the user once:
-    guess = input("Guess a letter: ").lower()
-    print("You guessed:", guess)
+    print("Willkommen bei Snowman Meltdown!")
+
+    while mistakes < max_failures:
+        display_game_state(mistakes, secret_word, guessed_letters)
+
+        # Win-Bedingung prüfen
+        if all(letter in guessed_letters for letter in secret_word):
+            print("Glückwunsch! Du hast das Wort erraten und den Schneemann gerettet!")
+            return
+
+        guess = input("Rate einen Buchstaben: ").lower()
+
+        if len(guess) != 1 or not guess.isalpha():
+            print("Bitte gib einen einzelnen Buchstaben ein.")
+            continue
+
+        if guess in guessed_letters:
+            print(f"Den Buchstaben '{guess}' hast du schon geraten.")
+            continue
+
+        guessed_letters.append(guess)
+
+        if guess not in secret_word:
+            print(f"Falsch! Der Buchstabe '{guess}' ist nicht im Wort. Der Schneemann schmilzt...")
+            mistakes += 1
+        else:
+            print(f"Richtig! '{guess}' ist im Wort enthalten.")
+
+    display_game_state(mistakes, secret_word, guessed_letters)
+    print("Oh nein! Der Schneemann ist geschmolzen.")
+    print(f"Das geheime Wort war: {secret_word}")
 
 
 if __name__ == "__main__":
